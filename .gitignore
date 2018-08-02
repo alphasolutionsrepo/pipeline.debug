@@ -1,1 +1,5 @@
 /Local copy.bat
+/packages
+/PipelineDebug/obj
+/PipelineDebug/bin
+/.vs
