@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Pipeline Debug</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+            integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+    <script src="PipelineDebug.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" />
+    <link rel="stylesheet" href="PipelineDebug.css" />
+
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+
+        </div>
+        <div class="menu">
+            <a href="#" id="menupipelines">Pipelines</a>
+            <a href="#" id="menuprocessors">Debug processors</a>
+            <a href="#" id="menusettings">Settings</a>
+            <a href="#" id="menuoutput">Memory output</a>
+            <a href="#" id="menuexport">Import/Export configuration</a>
+            <a href="#" id="menulogout">Logout</a>
+        </div>
+        <div id="content">
+            <div id="login" class="subpage">
+                <h1>Log in as Sitecore administrator</h1>
+                <input type="text" name="username" placeholder="username" />
+                <input type="password" name="password" placeholder="password" />
+                <button type="button" id="loginButton">Log in</button>
+            </div>
+            <div id="pipelines" class="subpage">
+                <h1>Pipelines</h1>
+                <select id="pipelineList" data-placeholder="Choose pipeline..." class="chosen-select">
+                    <option></option>
+                </select>
+                <div id="pipelineDetails">
+
+                </div>
+            </div>
+            <div id="processors" class="subpage">
+                <h1>Debug processors</h1>
+                <div id="debugProcessors">
+                    No DebugProcessors registered
+                </div>
+            </div>
+            <div id="settings" class="subpage">
+                <h1>Edit settings</h1>
+                <h3>Constraints</h3>
+                <div class="setting">
+                    <label for="sessionConstraint">
+                        Only output from current Session
+                    </label>
+                    <input type="checkbox" id="sessionConstraint" />
+                </div>
+
+                <div class="setting">
+                    <label for="siteConstraint">
+                        Site constraint
+                    </label>
+                    <input type="text" id="siteConstraint" />
+                </div>
+                <div class="setting">
+                    <label for="languageConstraint">
+                        Language constraint
+                    </label>
+                    <input type="text" id="languageConstraint" />
+                </div>
+                <div class="setting">
+                    <label for="includeUrlConstraint">
+                        Include url (regex pattern)
+                    </label>
+                    <input type="text" id="includeUrlConstraint" />
+                </div>
+                <div class="setting">
+                    <label for="excludeUrlConstraint">
+                        Exclude url (regex pattern)
+                    </label>
+                    <input type="text" id="excludeUrlConstraint" />
+                </div>
+                <h3>Output</h3>
+                <div class="setting">
+                    <label for="enableFileLogging">
+                        Log to Sitecore Diagnostics
+                    </label>
+                    <input type="checkbox" id="enableFileLogging" />
+                </div>
+                <div class="setting">
+                    <label for="enableMemoryLogging">
+                        Log to Memory
+                    </label>
+                    <input type="checkbox" id="enableMemoryLogging" />
+                </div>
+                <div class="setting">
+                    <label for="maxIterations">
+                        Max iterations of enumerables
+                    </label>
+                    <input type="text" id="maxIterations" />
+                </div>
+                <div class="setting">
+                    <label for="maxEntries">
+                        Max entries kept in Memory
+                    </label>
+                    <input type="text" id="maxEntries" />
+                </div>
+                <a href="#" class="ui-button ui-widget ui-corner-all" id="saveSettings">Save</a>
+            </div>
+            <div id="output" class="subpage">
+                <h1>Memory output</h1>
+                <h3>Choose processors</h3>
+                <div>
+                    <div id="processorlist">
+
+                    </div>
+                    <a href="#" id="outputReload">Reload</a>
+                </div>
+                <h3>Output</h3>
+                <div>
+                    <div id="outputdetails">
+
+                    </div>
+                </div>
+            </div>
+            <div id="importexport" class="subpage">
+                <h1>Import/Export configuration</h1>
+                <h3>Current Configuration (copy the contents of this and paste it into import later)</h3>
+                <div>
+                    <textarea rows="20" cols="100" disabled="disabled" id="exportConfiguration"></textarea>
+                </div>
+                <h3>Import Configuration (paste previously copied configuration here and click import)</h3>
+                <div>
+                    <textarea rows="20" cols="100" id="importConfiguration"></textarea><br />
+                    <a href="#" id="triggerImport">Import</a>
+                </div>
+            </div>
+        </div>
+        <div id="loading">
+        </div>
+        <div id="discovery">
+            
+        </div>
+    </div>
+    
+</body>
+</html>

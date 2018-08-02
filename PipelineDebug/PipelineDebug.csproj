@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0E07BF25-56B6-496A-ADF4-F4DAFE674D15}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PipelineDebug</RootNamespace>
+    <AssemblyName>PipelineDebug</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.1.0.0\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Kernel, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Kernel.NoReferences.8.2.180406\lib\NET452\Sitecore.Kernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Logging, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Logging.NoReferences.8.2.180406\lib\NET452\Sitecore.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\PipelineDebugController.cs" />
+    <Compile Include="Discovery\DiscoveryService.cs" />
+    <Compile Include="Discovery\Extensions.cs" />
+    <Compile Include="Discovery\IDiscoveryService.cs" />
+    <Compile Include="Model\Configuration.cs" />
+    <Compile Include="Model\ConfigurationDebugProcessor.cs" />
+    <Compile Include="Model\Request\AddProcessorRequest.cs" />
+    <Compile Include="Model\Request\DiscoverRequest.cs" />
+    <Compile Include="Model\Request\ImportConfigurationRequest.cs" />
+    <Compile Include="Model\Request\OutputRequest.cs" />
+    <Compile Include="Model\Request\ProcessorIdRequest.cs" />
+    <Compile Include="Model\Request\SaveTaxonomiesRequest.cs" />
+    <Compile Include="Model\Request\SaveSettingsRequest.cs" />
+    <Compile Include="Model\Request\MoveProcessorRequest.cs" />
+    <Compile Include="Model\Request\NamedPipelineRequest.cs" />
+    <Compile Include="Model\Response\DiscoveryResponse.cs" />
+    <Compile Include="Model\Response\DiscoveryRootsResponse.cs" />
+    <Compile Include="Model\Response\ExportConfigurationResponse.cs" />
+    <Compile Include="Model\Response\GetOutputResponse.cs" />
+    <Compile Include="Model\Response\GetDebugProcessorsResponse.cs" />
+    <Compile Include="Model\Response\GetSettingsResponse.cs" />
+    <Compile Include="Model\Response\GetProcessorSettingsResponse.cs" />
+    <Compile Include="Model\Response\PipelineDetailsResponse.cs" />
+    <Compile Include="Model\Request\LoginRequest.cs" />
+    <Compile Include="Model\Response\BaseResponse.cs" />
+    <Compile Include="Model\Response\PipelinesResponse.cs" />
+    <Compile Include="Model\Response\ResponseStatus.cs" />
+    <Compile Include="Model\SimpleProcessor.cs" />
+    <Compile Include="Output\IOutputService.cs" />
+    <Compile Include="Output\OutputService.cs" />
+    <Compile Include="Pipelines\Initialize\RegisterRoutes.cs" />
+    <Compile Include="Pipelines\PipelineService.cs" />
+    <Compile Include="Output\FixedSizeOutput.cs" />
+    <Compile Include="Model\OutputItem.cs" />
+    <Compile Include="Model\OutputMember.cs" />
+    <Compile Include="Pipelines\PipelineDebug\DebugProcessor.cs" />
+    <Compile Include="Pipelines\IPipelineService.cs" />
+    <Compile Include="Pipelines\PipelineWrapper.cs" />
+    <Compile Include="Pipelines\ProcessorWrapper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reflection\Implementation\Base.cs" />
+    <Compile Include="Reflection\Implementation\Sitecore_9_0_2.cs" />
+    <Compile Include="Reflection\IReflectionService.cs" />
+    <Compile Include="Reflection\IReflectionServiceFactory.cs" />
+    <Compile Include="Reflection\ReflectionServiceFactory.cs" />
+    <Compile Include="Security\AdministratorOnlyAttribute.cs" />
+    <Compile Include="Settings\Constraints\ExcludeUrlConstraint.cs" />
+    <Compile Include="Settings\Constraints\LanguageConstraint.cs" />
+    <Compile Include="Settings\Constraints\SiteConstraint.cs" />
+    <Compile Include="Settings\Constraints\IncludeUrlConstraint.cs" />
+    <Compile Include="Settings\Constraints\SessionConstraint.cs" />
+    <Compile Include="Model\DiscoveryItem.cs" />
+    <Compile Include="Settings\Constraints\IConstraint.cs" />
+    <Compile Include="Model\Settings.cs" />
+    <Compile Include="Settings\ISettingsService.cs" />
+    <Compile Include="Settings\SettingsService.cs" />
+    <Compile Include="Settings\SitecoreVersion.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="sitecore\admin\PipelineDebug.css" />
+    <Content Include="sitecore\admin\PipelineDebug.html" />
+    <Content Include="sitecore\admin\PipelineDebug.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App_Config\Include\PipelineDebug\PipelineDebug.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
