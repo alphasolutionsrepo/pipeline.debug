@@ -40,8 +40,8 @@ namespace PipelineDebug.Reflection.Implementation
         /// </summary>
         public virtual DebugProcessor InitializeDebugProcessor(CoreProcessor processor)
         {
-            var getMethod = typeof(CoreProcessor).GetMethod("GetMethod", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(object) }, null);
-            var pipelineMethod = getMethod.Invoke(processor, new object[] { new PipelineArgs() }) as PipelineMethod;
+            var getMethod = typeof(CoreProcessor).GetMethod("GetMethod", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(object[]) }, null);
+            var pipelineMethod = getMethod.Invoke(processor, new object[] { new object[] { new PipelineArgs() } }) as PipelineMethod;
             return GetPipelineMethodProcessor(pipelineMethod) as DebugProcessor;
         }
 
