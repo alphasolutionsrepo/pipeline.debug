@@ -3,12 +3,18 @@ using Newtonsoft.Json.Converters;
 using PipelineDebug.Discovery;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace PipelineDebug.Model
 {
     public class DiscoveryItem
     {
+        public DiscoveryItem()
+        {
+
+        }
+
         public DiscoveryItem(string errorMessage)
         {
             TypeName = "Error";
@@ -39,25 +45,25 @@ namespace PipelineDebug.Model
             TypeName = propertyInfo.PropertyType.AsString();
             MemberType = MemberTypes.Property;
 
-            if (propertyInfo.GetMethod.IsPublic)
+            if (propertyInfo.GetMethod?.IsPublic ?? false)
             {
                 ProtectionLevel = "public";
             }
-            else if (propertyInfo.GetMethod.IsAssembly)
+            else if (propertyInfo.GetMethod?.IsAssembly ?? false)
             {
                 ProtectionLevel = "internal";
             }
-            else if (propertyInfo.GetMethod.IsFamily)
+            else if (propertyInfo.GetMethod?.IsFamily ?? false)
             {
                 ProtectionLevel = "protected";
             }
-            else if (propertyInfo.GetMethod.IsPrivate)
+            else if (propertyInfo.GetMethod?.IsPrivate ?? false)
             {
                 ProtectionLevel = "private";
             }
             else
             {
-                ProtectionLevel = "unknown";
+                ProtectionLevel = "no getter";
             }
             HasToString = propertyInfo.PropertyType.HasToString();
             IsPrimitive = propertyInfo.PropertyType.IsPrimitive();
@@ -95,16 +101,18 @@ namespace PipelineDebug.Model
             IsPrimitive = fieldInfo.FieldType.IsPrimitive();
         }
 
+        
+
         [JsonIgnore]
-        public Type Type { get; }
+        public Type Type { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public MemberTypes MemberType { get; }
-        public string Taxonomy { get; }
-        public string TypeName { get; }
-        public string Name { get; }
-        public string ProtectionLevel { get; }
-        public bool IsPrimitive { get; }
-        public bool HasToString { get; }
+        public MemberTypes MemberType { get; set; }
+        public string Taxonomy { get; set; }
+        public string TypeName { get; set; }
+        public string Name { get; set; }
+        public string ProtectionLevel { get; set; }
+        public bool IsPrimitive { get; set; }
+        public bool HasToString { get; set; }
         public List<DiscoveryItem> Members { get; set; }
     }
 }

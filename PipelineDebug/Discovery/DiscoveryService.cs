@@ -37,7 +37,7 @@ namespace PipelineDebug.Discovery
                 if (current.Members == null)
                 {
                     current.Members = new List<DiscoveryItem>();
-                    GetMembersRecursive(current.Type, current);
+                    GetMembers(current.Type, current);
                     return current;
                 }
 
@@ -64,21 +64,20 @@ namespace PipelineDebug.Discovery
             return null;
         }
 
-        protected virtual void GetMembersRecursive(Type type, DiscoveryItem item)
+        protected virtual void GetMembers(Type type, DiscoveryItem item)
         {
             if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type))
             {
                 var genericType = type.EnumerableType();
                 if (genericType != null)
                 {
-                    GetMembersRecursive(genericType, item);
+                    GetMembers(genericType, item);
                     return;
                 }
                 else
                 {
                     //If it wasn't IEnumberable<T> or inherited from IEnumerable<T> then it's unhandled right now
                     item.Members.Add(new DiscoveryItem("Unhandled IEnumerable type"));
-
                     return;
                 }
             }
@@ -86,26 +85,38 @@ namespace PipelineDebug.Discovery
             var members = type.GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
             foreach (var mem in members)
             {
-                var newTaxonomy = $"{item.Taxonomy}.{mem.Name}";
-                if (!item.Members.Any(di => mem.Name == di.Name))
-                if (mem.MemberType == MemberTypes.Field)
+                //We don't support explicit interface implementations as of now. That would require casting on the other end which doesn't make it it that easy
+                if (mem.Name.Contains("."))
                 {
-                    var fld = (FieldInfo)mem;
-                    if (fld.IsDefined(typeof(CompilerGeneratedAttribute), true))
-                        continue;
-                    item.Members.Add(new DiscoveryItem(fld, newTaxonomy));
+                    continue;
                 }
-                else if (mem.MemberType == MemberTypes.Property)
+                if (!item.Members.Any(di => mem.Name == di.Name))
                 {
-                    var prop = (PropertyInfo)mem;
-                    if (prop.IsDefined(typeof(CompilerGeneratedAttribute), true))
-                        continue;
+                    var newTaxonomy = $"{item.Taxonomy}.{mem.Name}";
+
+                    if (mem.MemberType == MemberTypes.Field)
+                    {
+                        var fld = (FieldInfo)mem;
+                        if (fld.IsDefined(typeof(CompilerGeneratedAttribute), true))
+                        {
+                            continue;
+                        }
+                        item.Members.Add(new DiscoveryItem(fld, newTaxonomy));
+                    }
+                    else if (mem.MemberType == MemberTypes.Property)
+                    {
+                        var prop = (PropertyInfo)mem;
+                        if (prop.IsDefined(typeof(CompilerGeneratedAttribute), true))
+                        {
+                            continue;
+                        }
                         item.Members.Add(new DiscoveryItem(prop, newTaxonomy));
+                    }
                 }
             }
             if (type.BaseType != null)
             {
-                GetMembersRecursive(type.BaseType, item);
+                GetMembers(type.BaseType, item);
             }
         }
     }

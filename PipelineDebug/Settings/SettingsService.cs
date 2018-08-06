@@ -1,4 +1,7 @@
-﻿using PipelineDebug.Settings.Constraints;
+﻿using Newtonsoft.Json;
+using PipelineDebug.Model;
+using PipelineDebug.Settings.Constraints;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -18,6 +21,18 @@ namespace PipelineDebug.Settings
             if (!string.IsNullOrWhiteSpace(exclude))
             {
                 Constraints.Add(new ExcludeUrlConstraint(exclude));
+            }
+            var theUsualSuspects = Sitecore.Configuration.Settings.GetSetting("PipelineDebug.Setting.TheUsualSuspects");
+            if (!string.IsNullOrWhiteSpace(theUsualSuspects))
+            {
+                try
+                {
+                    TheUsualSuspects = JsonConvert.DeserializeObject<DiscoveryItem>(theUsualSuspects);
+                }
+                catch (Exception)
+                {
+                    //couldn't deserialize
+                }
             }
         }
 
@@ -73,5 +88,7 @@ namespace PipelineDebug.Settings
         public virtual int MaxMemoryEntries { get; protected set; }
         public virtual bool LogToDiagnostics { get; protected set; }
         public virtual bool LogToMemory { get; protected set; }
+        public virtual DiscoveryItem TheUsualSuspects { get; protected set; }
+        
     }
 }

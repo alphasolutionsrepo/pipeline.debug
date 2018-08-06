@@ -1,4 +1,5 @@
-﻿using PipelineDebug.Settings.Constraints;
+﻿using PipelineDebug.Model;
+using PipelineDebug.Settings.Constraints;
 using System.Collections.Generic;
 
 namespace PipelineDebug.Settings
@@ -12,5 +13,6 @@ namespace PipelineDebug.Settings
         int MaxMemoryEntries { get; }
         bool LogToDiagnostics { get; }
         bool LogToMemory { get; }
+        DiscoveryItem TheUsualSuspects { get; }
     }
 }

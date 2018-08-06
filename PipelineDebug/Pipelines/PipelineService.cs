@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PipelineDebug.Model;
 using PipelineDebug.Reflection;
+using PipelineDebug.Settings;
 using Sitecore.Abstractions;
 using Sitecore.DependencyInjection;
 using Sitecore.Pipelines;
@@ -15,6 +16,7 @@ namespace PipelineDebug.Pipelines
     public class PipelineService : IPipelineService
     {
         protected IReflectionService ReflectionService;
+        protected ISettingsService SettingsService;
         protected BaseFactory BaseFactory;
         protected List<PipelineWrapper> ConfiguredPipelines = new List<PipelineWrapper>();
         protected Dictionary<string, ProcessorWrapper> ProcessorMap = new Dictionary<string, ProcessorWrapper>();
@@ -23,6 +25,7 @@ namespace PipelineDebug.Pipelines
         {
             var factory = ServiceLocator.ServiceProvider.GetRequiredService<IReflectionServiceFactory>();
             ReflectionService = factory.GetVersionSpecificService();
+            SettingsService = ServiceLocator.ServiceProvider.GetRequiredService<ISettingsService>();
             BaseFactory = ServiceLocator.ServiceProvider.GetRequiredService<BaseFactory>();
 
             InitializePipelines();
@@ -51,6 +54,11 @@ namespace PipelineDebug.Pipelines
             pipeline.CorePipeline = CorePipelineFactory.GetPipeline(pipeline.Name, pipeline.Group);
 
             var processors = ReflectionService.GetProcessors(pipeline.CorePipeline);
+            if (SettingsService.TheUsualSuspects != null)
+            {
+                pipeline.DiscoveryRoots.Add(SettingsService.TheUsualSuspects);
+            }
+
             pipeline.DiscoveryRoots.AddRange(GetAllProcessorArgTypes(pipeline.CorePipeline).Select(t => new DiscoveryItem(t)));
             pipeline.DiscoveryRoots.Add(new DiscoveryItem(typeof(Sitecore.Context)));
             foreach (var processor in processors)

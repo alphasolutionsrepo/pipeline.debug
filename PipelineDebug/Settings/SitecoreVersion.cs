@@ -25,8 +25,8 @@ namespace PipelineDebug.Settings
 
         private static int Compare(string version)
         {
-            var a = version.Split('.');
-            var b = _sitecoreVersion.Split('.');
+            var a = _sitecoreVersion.Split('.');
+            var b = version.Split('.');
             for (int i=0; i < Math.Max(a.Length, b.Length); i++)
             {
                 if (i > a.Length)

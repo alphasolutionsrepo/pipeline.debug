@@ -18,6 +18,10 @@ namespace PipelineDebug.Discovery
             try
             {
                 var checkType = type.EnumerableType() ?? type;
+                //If the type is object we make it outputtable.
+                if (checkType == typeof(object))
+                    return true;
+
                 var toString = checkType.GetMethod("ToString", BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance, null, new Type[0], null);
                 return (toString != null && toString.DeclaringType != typeof(object));
             }
