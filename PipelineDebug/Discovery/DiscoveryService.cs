@@ -18,19 +18,13 @@ namespace PipelineDebug.Discovery
                 return null;
             }
 
-            var path = taxonomy.Split('.').ToList();
-            if (path.Count == 0)
-            {
-                return null;
-            }
-            var rootName = path[0];
-            path.RemoveAt(0);
-
-            var current = pipelineWrapper.DiscoveryRoots.FirstOrDefault(r => r.TypeName == rootName);
+            var current = pipelineWrapper.DiscoveryRoots.FirstOrDefault(r => taxonomy.StartsWith(r.Name));
             if (current == null)
             {
                 return null;
             }
+
+            var path = taxonomy.Substring(current.Name.Length).Split('.').ToList();
 
             while (true)
             {
@@ -77,7 +71,7 @@ namespace PipelineDebug.Discovery
                 else
                 {
                     //If it wasn't IEnumberable<T> or inherited from IEnumerable<T> then it's unhandled right now
-                    item.Members.Add(new DiscoveryItem("Unhandled IEnumerable type"));
+                    item.Members.Add(new DiscoveryItem("Unhandled IEnumerable type", type.FullName));
                     return;
                 }
             }

@@ -22,27 +22,18 @@ namespace PipelineDebug.Settings
             {
                 Constraints.Add(new ExcludeUrlConstraint(exclude));
             }
-            var theUsualSuspects = Sitecore.Configuration.Settings.GetSetting("PipelineDebug.Setting.TheUsualSuspects");
-            if (!string.IsNullOrWhiteSpace(theUsualSuspects))
-            {
-                try
-                {
-                    TheUsualSuspects = JsonConvert.DeserializeObject<DiscoveryItem>(theUsualSuspects);
-                }
-                catch (Exception)
-                {
-                    //couldn't deserialize
-                }
-            }
+
+            SetDefaultTaxonomies(Sitecore.Configuration.Settings.GetSetting("PipelineDebug.Setting.DefaultTaxonomies"));
         }
 
-        public virtual void FromSettings(Model.Settings settings)
+        public virtual void SetSettings(Model.Settings settings)
         {
             Constraints.Clear();
-            if (settings.SessionOnly)
+            var sessionId = HttpContext.Current?.Request?.Cookies["ASP.Net_SessionId"]?.Value;
+            if (settings.SessionOnly && !string.IsNullOrWhiteSpace(sessionId))
             {
                 //Have to use the cookie since the session isn't initialized in this context.
-                Constraints.Add(new SessionConstraint(HttpContext.Current?.Request?.Cookies["ASP.Net_SessionId"]?.Value));
+                Constraints.Add(new SessionConstraint(sessionId));
             }
             if (!string.IsNullOrWhiteSpace(settings.Site))
             {
@@ -65,9 +56,10 @@ namespace PipelineDebug.Settings
             MaxMemoryEntries = settings.MaxMemoryEntries;
             LogToDiagnostics = settings.LogToDiagnostics;
             LogToMemory = settings.LogToMemory;
+            SetDefaultTaxonomies(settings.DefaultTaxonomies);
         }
 
-        public virtual Model.Settings ToSettings()
+        public virtual Model.Settings GetSettings()
         {
             return new Model.Settings
             {
@@ -79,8 +71,14 @@ namespace PipelineDebug.Settings
                 LogToDiagnostics = LogToDiagnostics,
                 LogToMemory = LogToMemory,
                 MaxEnumerableIterations = MaxEnumerableIterations,
-                MaxMemoryEntries = MaxMemoryEntries
+                MaxMemoryEntries = MaxMemoryEntries,
+                DefaultTaxonomies = string.Join("|", DefaultTaxonomies)
             };
+        }
+
+        protected void SetDefaultTaxonomies(string taxonomies)
+        {
+            DefaultTaxonomies = taxonomies.Split('|').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
         }
 
         public virtual List<IConstraint> Constraints { get; protected set; }
@@ -88,7 +86,7 @@ namespace PipelineDebug.Settings
         public virtual int MaxMemoryEntries { get; protected set; }
         public virtual bool LogToDiagnostics { get; protected set; }
         public virtual bool LogToMemory { get; protected set; }
-        public virtual DiscoveryItem TheUsualSuspects { get; protected set; }
+        public virtual List<string> DefaultTaxonomies { get; protected set; }
         
     }
 }

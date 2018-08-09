@@ -181,14 +181,14 @@ namespace PipelineDebug.Controllers
             return new GetSettingsResponse()
             {
                 Status = ResponseStatus.Success,
-                Settings = SettingsService.ToSettings()
+                Settings = SettingsService.GetSettings()
             };
         }
 
         [HttpPost]
         public virtual BaseResponse SaveSettings(SaveSettingsRequest request)
         {
-            SettingsService.FromSettings(request);
+            SettingsService.SetSettings(request);
 
             return new BaseResponse()
             {
@@ -244,7 +244,7 @@ namespace PipelineDebug.Controllers
             }
 
             //Set settings
-            SettingsService.FromSettings(request.Settings);
+            SettingsService.SetSettings(request.Settings);
 
             //Add debug processors - make sure to take lowest indexes first, or they will get odd indexes
             foreach (var processor in request.DebugProcessors.OrderBy(p => p.PipelineIndex))
@@ -264,7 +264,7 @@ namespace PipelineDebug.Controllers
         {
             var config = new Configuration()
             {
-                Settings = SettingsService.ToSettings(),
+                Settings = SettingsService.GetSettings(),
                 DebugProcessors = CorePipelineService.GetDebugProcessors().Select(p => new ConfigurationDebugProcessor(p.DebugProcessor)).ToList()
             };
 

@@ -22,7 +22,6 @@
 #content {
     border: 1px solid black;
     padding: 7px;
-
 }
 .subpage {
     display: none;
@@ -62,11 +61,30 @@
     display: none;
     font-size: 16px;
 }
-.discovery > img {
+.discovery > .icon {
     display: inline-block;
     height: 16px;
     width: 16px;
     margin: 0 3px 0 0;
+}
+.discovery .children {
+    display: none;
+    margin: 0 0 0 20px;
+}
+.discovery > img.closed {
+    display: none;
+}
+.discovery > img.opened {
+    display: inline-block;
+}
+.discovery.opened > img.closed {
+    display: inline-block;
+}
+.discovery.opened > img.opened {
+    display: none;
+}
+.discovery.opened > .children {
+    display: block;
 }
 .discovery > .addtaxonomy {
     pointer-events: none;
@@ -76,12 +94,11 @@
     pointer-events: all;
     opacity: 1;
 }
-.discoverable {
-    color: blue;
-    cursor: pointer;
+.discovery .typename {
+    color: #666;
 }
-.children {
-    margin: 0 0 0 20px;
+#discovery input[type=text] {
+    width: 500px;
 }
 .setting {
     margin: 5px 0;

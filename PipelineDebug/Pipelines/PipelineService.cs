@@ -54,13 +54,21 @@ namespace PipelineDebug.Pipelines
             pipeline.CorePipeline = CorePipelineFactory.GetPipeline(pipeline.Name, pipeline.Group);
 
             var processors = ReflectionService.GetProcessors(pipeline.CorePipeline);
-            if (SettingsService.TheUsualSuspects != null)
+
+            var argTypes = GetAllProcessorArgTypes(pipeline.CorePipeline);
+            if (argTypes.Count > 1)
             {
-                pipeline.DiscoveryRoots.Add(SettingsService.TheUsualSuspects);
+                for (var i = 0; i < argTypes.Count; i++)
+                {
+                    pipeline.DiscoveryRoots.Add(new DiscoveryItem($"{Constants.ArgsName}[{i}]", argTypes[i]));
+                }
+            }
+            else
+            {
+                pipeline.DiscoveryRoots.Add(new DiscoveryItem(Constants.ArgsName, argTypes.First()));
             }
 
-            pipeline.DiscoveryRoots.AddRange(GetAllProcessorArgTypes(pipeline.CorePipeline).Select(t => new DiscoveryItem(t)));
-            pipeline.DiscoveryRoots.Add(new DiscoveryItem(typeof(Sitecore.Context)));
+            pipeline.DiscoveryRoots.Add(new DiscoveryItem(Constants.ContextName, typeof(Sitecore.Context)));
             foreach (var processor in processors)
             {
                 pipeline.Processors.Add(new ProcessorWrapper(processor, pipeline));
@@ -95,6 +103,7 @@ namespace PipelineDebug.Pipelines
             debugProcessor.PipelineGroup = group;
             debugProcessor.PipelineName = name;
             debugProcessor.PipelineIndex = index;
+            debugProcessor.Taxonomies = SettingsService.DefaultTaxonomies;
 
             //Add it to our simple pipeline
             var pipeline = GetPipeline(group, name);
@@ -153,6 +162,11 @@ namespace PipelineDebug.Pipelines
             }
         }
 
+        /// <summary>
+        /// We dont include baseclasses if we find derived, but it's actually possible that we get multiple derived of the same baseclass, thus we return a list
+        /// </summary>
+        /// <param name="pipeline"></param>
+        /// <returns></returns>
         protected virtual List<Type> GetAllProcessorArgTypes(CorePipeline pipeline)
         {
             var types = new List<Type>();

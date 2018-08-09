@@ -153,8 +153,10 @@ var processors = {
 
 var discoveryOverlay = {
     init: function () {
-        $('#discovery').on('click', '.discoverable', function () { discoveryOverlay.discover(this); });
-        $('#discovery').on('click', '.discoverable input', function (event) { event.stopPropagation(); });
+        $('#discovery').on('click', '.toggle', discoveryOverlay.toggleChildren);
+        $('#discovery').on('click', 'input.custom', discoveryOverlay.addCustom);
+        $('#discovery').on('click', 'input.addtaxonomy', discoveryOverlay.toggleTaxonomy);
+        $('#discovery').on('click', 'input.selectedtaxonomy', discoveryOverlay.toggleSelectedTaxonomy);
     },
     load: function (element) {
         var id = $(element).closest('li').data('processorid');
@@ -167,45 +169,86 @@ var discoveryOverlay = {
         discoveryOverlay.show();
     },
     render: function (result) {
-        $('#discovery').empty().html($.map(result.DiscoveryRoots, function (root, i) { return discoveryOverlay.renderSubtree(root, result.Taxonomies); }).join(''));
+        var container = $('#discovery');
+        container.empty();
+        container.append('<h2>Selected</h2>');
+        container.append(discoveryOverlay.renderTaxonomies(result.Taxonomies));
+        container.append('<h2>Discovery</h2>');
+        container.append(discoveryOverlay.renderDiscoveryRoots(result));
     },
-    renderSubtree: function (discoveryItem, taxonomies) {
+    renderTaxonomies: function (taxonomies) {
+        return '<div class="selected">' +
+            $.map(taxonomies, function (taxonomy) { return discoveryOverlay.renderTaxonomy(taxonomy); }).join('') +
+            discoveryOverlay.renderCustomRow() +
+            '</div>';
+    },
+    renderTaxonomy: function (taxonomy) {
+        return '<div>' +
+            '<input type="checkbox" class="selectedtaxonomy" checked="checked" value="' + taxonomy + '" />' +
+            taxonomy +
+            '</div>';
+    },
+    renderCustomRow: function () {
+        return '<div>' +
+            '<input type="checkbox" class="selectedtaxonomy custom" />' +
+            '<input type="text" placeholder="add a custom taxonomy" />' +
+            '</div>';
+    },
+    renderDiscoveryRoots: function (result) {
+        return '<div class="discoveryroots">' +
+            $.map(result.DiscoveryRoots, function (root, i) { return discoveryOverlay.renderSubtree(root, result.Taxonomies, false, null); }).join('') +
+            '</div>';
+    },
+    renderSubtree: function (discoveryItem, taxonomies, expand, parentType) {
         var children = '', checked = '', icons = '';
 
         var css = new Array();
-        if (!discoveryItem.IsPrimitive && discoveryItem.Members === null) {
-            css.push('discoverable');
+        if (expand) {
+            css.push('opened');
         }
         if (discoveryItem.HasToString) {
             css.push('selectable');
         }
 
-        if (discoveryItem.ProtectionLevel === 'Public') {
-            icons += '<img src="/~/icon/office/16x16/lock_open.png" title="Public" />';
+        if (!discoveryItem.IsPrimitive) {
+            icons += '<img src="/sitecore/shell/themes/standard/images/treemenu_expanded.png" class="icon toggle closed" />';
+            icons += '<img src="/sitecore/shell/themes/standard/images/treemenu_collapsed.png" class="icon toggle opened" />';
         } else {
-            icons += '<img src="/~/icon/office/16x16/lock.png" class="icon private" title="' + discoveryItem.ProtectionLevel + '" />';
-        }
-
-        if (discoveryItem.MemberType === 'Property') {
-            icons += '<img src="/~/icon/office/16x16/gearwheels.png" class="icon property" title="Property" />';
-        } else {
-            icons += '<img src="/~/icon/office/16x16/document_text.png" class="icon field" title="' + discoveryItem.MemberType + '" />';
+            icons += '<img src="/sitecore/shell/themes/standard/images/noexpand15x15.gif" class="icon" />';
         }
 
         if ($.inArray(discoveryItem.Taxonomy, taxonomies) >= 0) {
             checked += 'checked';
         }
+        icons += '<input type="checkbox" class="addtaxonomy" ' + checked + ' value="' + discoveryItem.Taxonomy +'" />';
 
+        if (discoveryItem.ProtectionLevel.toLowerCase() === 'public') {
+            icons += '<img src="/~/icon/office/16x16/lock_open.png" class="icon" title="public" />';
+        } else {
+            icons += '<img src="/~/icon/office/16x16/lock.png" class="icon private" title="' + discoveryItem.ProtectionLevel + '" />';
+        }
+
+        if (discoveryItem.MemberType.toLowerCase() === 'property') {
+            icons += '<img src="/~/icon/office/16x16/gearwheels.png" class="icon property" title="Property" />';
+        } else {
+            icons += '<img src="/~/icon/office/16x16/document_text.png" class="icon field" title="' + discoveryItem.MemberType + '" />';
+        }
+
+        if (parentType === null || parentType === discoveryItem.DeclaringType) {
+            icons += '<img src="/~/icon/office/16x16/document_empty.png" class="icon local" title="local member of ' + discoveryItem.DeclaringType + '" />';
+        } else {
+            icons += '<img src="/~/icon/office/16x16/copy_to.png" class="icon derived" title="derived from ' + discoveryItem.DeclaringType + '" />';
+        }
+        
         if (discoveryItem.Members !== null && discoveryItem.Members.length > 0) {
             children += '<div class="children">';
-            children += $.map(discoveryItem.Members, function (item, i) { return discoveryOverlay.renderSubtree(item, taxonomies); }).join('');
+            children += $.map(discoveryItem.Members, function (item, i) { return discoveryOverlay.renderSubtree(item, taxonomies, false, discoveryItem.TypeFullName); }).join('');
             children += '</div>';
         }
 
-        return '<div data-taxonomy="' + discoveryItem.Taxonomy + '" class="discovery ' + css.join(' ') + '">' +
-            '<input type="checkbox" title="' + discoveryItem.Taxonomy + '" class="addtaxonomy" ' + checked + ' />' +
+        return '<div title="' + discoveryItem.Taxonomy + '" class="discovery ' + css.join(' ') + '">' +
             icons +
-            util.htmlEncode(discoveryItem.TypeName) + ' ' + discoveryItem.Name +
+            discoveryItem.Name + ' <span class="typename" title="' + util.htmlEncode(discoveryItem.TypeFullName) + '">' + util.htmlEncode(discoveryItem.TypeName) + '</span>' +
             children +
             '</div>';
     },
@@ -214,21 +257,62 @@ var discoveryOverlay = {
             modal: true,
             width: 800,
             height: 600,
-            buttons: { Save: discoveryOverlay.save }
+            buttons: {
+                Cancel: function () { $(this).dialog("close"); },
+                Save: discoveryOverlay.save
+            }
         });
     },
+    toggleChildren: function () {
+        var element = $(this).closest('.discovery');
+        var children = element.children('.children');
+        if (children.length === 1) {
+            if (element.hasClass('opened')) {
+                element.removeClass('opened');
+                element.addClass('closed');
+            } else {
+                element.removeClass('closed');
+                element.addClass('opened');
+            }
+        } else {
+            discoveryOverlay.discover(element);
+        }
+    },
+    addCustom: function () {
+        if ($('.selected input.custom:not(:checked)').length === 0) {
+            $('.selected').append(discoveryOverlay.renderCustomRow());
+        }
+    },
+    toggleTaxonomy: function () {
+        var taxonomy = $(this).val();
+        var input = $('.selected input[value="' + taxonomy + '"]');
+        if (input.length === 0) {
+            $('.selected').append(discoveryOverlay.renderTaxonomy(taxonomy));
+        } else {
+            input.prop('checked', $(this).is(':checked'));
+        }
+    },
+    toggleSelectedTaxonomy: function () {
+        var taxonomy = discoveryOverlay.selectedTaxonomyValue(this);
+        $('.discoveryroots input[value="' + taxonomy + '"]').prop('checked', $(this).is(':checked'));
+    },
+    selectedTaxonomyValue: function (elem) {
+        if ($(elem).hasClass('custom')) {
+            return $(elem).siblings('input[type=text]').val();
+        } 
+        return $(elem).val();
+    },
     discover: function (element) {
-        var taxonomy = $(element).data('taxonomy');
+        var taxonomy = $(element).attr('title');
         var taxonomies = new Array();
         if ($(element).find('input').is(':checked')) {
             taxonomies.push(taxonomy);
         }
         var data = { ProcessorId: $('#discovery').data('processorid'), Taxonomy: taxonomy };
-        service.update('discover', data, function (result) { $(element).replaceWith(discoveryOverlay.renderSubtree(result.DiscoveryItem, taxonomies)); });
-        return;
+        service.update('discover', data, function (result) { $(element).replaceWith(discoveryOverlay.renderSubtree(result.DiscoveryItem, taxonomies, true, null)); });
     },
     save: function () {
-        var taxonomies = $.map($('#discovery .selectable > input:checked'), function (input) { return $(input).attr('title'); });
+        var taxonomies = $.map($('.selected input:checked'), function (input) { return discoveryOverlay.selectedTaxonomyValue(input); });
         var data = { ProcessorId: $('#discovery').data('processorid'), Taxonomies: taxonomies };
         service.update('saveprocessortaxonomies', data, null);
         $(this).dialog("close");
@@ -261,9 +345,10 @@ var settings = {
         $('#enableMemoryLogging').prop('checked', result.Settings.LogToMemory);
         $('#maxEntries').val(result.Settings.MaxMemoryEntries);
         $('#maxIterations').val(result.Settings.MaxEnumerableIterations);
+        $('#defaultTaxonomies').val(result.Settings.DefaultTaxonomies);
     },
     save: function () {
-        var data = { SessionOnly: $('#sessionConstraint').is(':checked'), Site: $('#siteConstraint').val(), Language: $('#languageConstraint').val(), IncludeUrlPattern: $('#includeUrlConstraint').val(), ExcludeUrlPattern: $('#excludeUrlConstraint').val(), LogToDiagnostics: $('#enableFileLogging').is(':checked'), LogToMemory: $('#enableMemoryLogging').is(':checked'), MaxMemoryEntries: $('#maxEntries').val(), MaxEnumerableIterations: $('#maxIterations').val() };
+        var data = { SessionOnly: $('#sessionConstraint').is(':checked'), Site: $('#siteConstraint').val(), Language: $('#languageConstraint').val(), IncludeUrlPattern: $('#includeUrlConstraint').val(), ExcludeUrlPattern: $('#excludeUrlConstraint').val(), LogToDiagnostics: $('#enableFileLogging').is(':checked'), LogToMemory: $('#enableMemoryLogging').is(':checked'), MaxMemoryEntries: $('#maxEntries').val(), MaxEnumerableIterations: $('#maxIterations').val(), DefaultTaxonomies: $('#defaultTaxonomies').val() };
         service.update('savesettings', data, null);
     }
 };
@@ -303,7 +388,7 @@ var output = {
             $('#outputdetails').html($.map(result.Output, output.renderOutputItem).join(''));
     },
     renderOutputItem(item) {
-        var entries = $.map(item.Entries, function (entry) { return '<span class="output entry">' + entry.Taxonomy + ': ' + entry.Value + '</span>'; }).join('<br />');
+        var entries = $.map(item.Entries, function (entry) { return '<span class="output entry"><strong>' + entry.Taxonomy + ':</strong> ' + entry.Value + '</span>'; }).join('<br />');
         return '<div><span class="output time">' + new Date(item.Time).toLocaleTimeString() + '</span> <span class="output name">' + item.ProcessorName + '</span><span class="output type">(' + item.ArgsType + ')</span><br />' + entries + '</div>';
     }
 };

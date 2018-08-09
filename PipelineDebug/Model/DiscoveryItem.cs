@@ -10,31 +10,26 @@ namespace PipelineDebug.Model
 {
     public class DiscoveryItem
     {
-        public DiscoveryItem()
+        public DiscoveryItem(string errorMessage, string declaringType)
         {
-
-        }
-
-        public DiscoveryItem(string errorMessage)
-        {
-            TypeName = "Error";
             Name = errorMessage;
             IsPrimitive = true;
             HasToString = false;
             MemberType = MemberTypes.Custom;
             ProtectionLevel = "Unknown";
+            DeclaringType = declaringType;
         }
 
-        public DiscoveryItem(Type discoveryRootType)
+        public DiscoveryItem(string name, Type discoveryRootType)
         {
-            Name = string.Empty;
+            Name = name;
             Type = discoveryRootType;
-            Taxonomy = discoveryRootType.Name;
-            TypeName = discoveryRootType.AsString();
+            Taxonomy = name;
             MemberType = MemberTypes.TypeInfo;
             ProtectionLevel = "public";
             IsPrimitive = false;
             HasToString = false;
+            DeclaringType = discoveryRootType.FullName;
         }
 
         public DiscoveryItem(PropertyInfo propertyInfo, string taxonomy)
@@ -42,8 +37,8 @@ namespace PipelineDebug.Model
             Name = propertyInfo.Name;
             Taxonomy = taxonomy;
             Type = propertyInfo.PropertyType;
-            TypeName = propertyInfo.PropertyType.AsString();
             MemberType = MemberTypes.Property;
+            DeclaringType = propertyInfo.DeclaringType.FullName;
 
             if (propertyInfo.GetMethod?.IsPublic ?? false)
             {
@@ -74,9 +69,9 @@ namespace PipelineDebug.Model
             Name = fieldInfo.Name;
             Taxonomy = taxonomy;
             Type = fieldInfo.FieldType;
-            TypeName = fieldInfo.FieldType.AsString();
             MemberType = MemberTypes.Field;
-            
+            DeclaringType = fieldInfo.DeclaringType.FullName;
+
             if (fieldInfo.IsPublic)
             {
                 ProtectionLevel = "public";
@@ -106,13 +101,28 @@ namespace PipelineDebug.Model
         [JsonIgnore]
         public Type Type { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public MemberTypes MemberType { get; set; }
-        public string Taxonomy { get; set; }
-        public string TypeName { get; set; }
-        public string Name { get; set; }
-        public string ProtectionLevel { get; set; }
-        public bool IsPrimitive { get; set; }
-        public bool HasToString { get; set; }
+        public MemberTypes MemberType { get; private set; }
+        public string Taxonomy { get; private set; }
+        public string TypeName
+        {
+            get
+            {
+                return Type?.Name;
+            }
+        }
+        public string TypeFullName
+        {
+            get
+            {
+                return Type?.FullName;
+            }
+        }
+        public string Name { get; private set; }
+        public string ProtectionLevel { get; private set; }
+        public bool IsPrimitive { get; private set; }
+        public bool HasToString { get; private set; }
         public List<DiscoveryItem> Members { get; set; }
+        public string DeclaringType { get; private set; }
+        
     }
 }

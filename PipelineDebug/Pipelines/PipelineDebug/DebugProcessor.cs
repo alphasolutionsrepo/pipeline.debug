@@ -54,17 +54,25 @@ namespace PipelineDebug.Pipelines.PipelineDebug
                     if (string.IsNullOrWhiteSpace(taxonomy))
                         continue;
 
-                    var hierarchy = taxonomy.Split('.').ToList();
-                    var name = hierarchy[0];
-                    hierarchy.RemoveAt(0);
-
-                    if (name == typeof(Sitecore.Context).Name)
+                    if (taxonomy.StartsWith(Constants.ContextName))
                     {
-                        OutputTaxonomyValueRecursive(new Sitecore.Context(), hierarchy, name, output);
+                        var removedName = taxonomy.Substring(Constants.ContextName.Length + 1);
+                        var hierarchy = removedName.Split('.').ToList();
+                        OutputTaxonomyValueRecursive(new Sitecore.Context(), hierarchy, Constants.ContextName, output);
                     }
-                    else
+                    else if (taxonomy.StartsWith(Constants.ArgsName))
                     {
-                        OutputTaxonomyValueRecursive(args, hierarchy, name, output);
+                        string removedName;
+                        if (taxonomy.Contains("]"))
+                        {
+                            removedName = taxonomy.Substring(taxonomy.IndexOf(']') + 2);
+                        }
+                        else
+                        {
+                            removedName = taxonomy.Substring(Constants.ArgsName.Length + 1);
+                        }
+                        var hierarchy = removedName.Split('.').ToList();
+                        OutputTaxonomyValueRecursive(args, hierarchy, Constants.ArgsName, output);
                     }
                 }
             }

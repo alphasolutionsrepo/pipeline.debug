@@ -12,5 +12,7 @@
         public bool LogToMemory { get; set; }
         public int MaxEnumerableIterations { get; set; }
         public int MaxMemoryEntries { get; set; }
+
+        public string DefaultTaxonomies { get; set; }
     }
 }

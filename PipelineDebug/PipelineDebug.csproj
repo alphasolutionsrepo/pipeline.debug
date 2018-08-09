@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Controllers\PipelineDebugController.cs" />
     <Compile Include="Discovery\DiscoveryService.cs" />
     <Compile Include="Discovery\Extensions.cs" />

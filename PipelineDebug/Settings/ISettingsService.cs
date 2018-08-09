@@ -6,13 +6,13 @@ namespace PipelineDebug.Settings
 {
     public interface ISettingsService
     {
-        void FromSettings(Model.Settings settings);
-        Model.Settings ToSettings();
+        void SetSettings(Model.Settings settings);
+        Model.Settings GetSettings();
         List<IConstraint> Constraints { get; }
         int MaxEnumerableIterations { get; }
         int MaxMemoryEntries { get; }
         bool LogToDiagnostics { get; }
         bool LogToMemory { get; }
-        DiscoveryItem TheUsualSuspects { get; }
+        List<string> DefaultTaxonomies { get; }
     }
 }
