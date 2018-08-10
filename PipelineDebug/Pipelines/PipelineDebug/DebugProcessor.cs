@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PipelineDebug.Discovery;
 using PipelineDebug.Model;
 using PipelineDebug.Output;
 using PipelineDebug.Settings;
@@ -130,6 +131,10 @@ namespace PipelineDebug.Pipelines.PipelineDebug
                     int i = 0;
                     bool any = false;
 
+                    //We use stringindexing if it's not a generic IEnumerable and there's a string indexer
+                    var stringIndexParam = member.GetType().StringIndexParameter();
+                    var stringIndexed = member.GetType().EnumerableType() == null && stringIndexParam != null;
+
                     foreach (var entry in ((IEnumerable)member))
                     {
                         if (i >= SettingsService.MaxEnumerableIterations)
@@ -138,15 +143,25 @@ namespace PipelineDebug.Pipelines.PipelineDebug
                         }
 
                         any = true;
-
                         var enumTaxonomy = currentTaxonomy + "[" + i + "]";
+                        
                         if (hierarchy.Count == 0)
                         {
                             output.Entries.Add(new OutputMember(currentTaxonomy, entry.ToString(), info.MemberType));
                         }
                         else
                         {
-                            OutputTaxonomyValueRecursive(entry, hierarchy, enumTaxonomy, output);
+                            var hierarchyCopy = hierarchy.Select(item => item).ToList();
+                            if (stringIndexed)
+                            {
+                                var value = stringIndexParam.GetValue(member, new object[] { entry });
+                                var kvp = new KeyValuePair<string, object>((string)entry, value);
+                                OutputTaxonomyValueRecursive(kvp, hierarchyCopy, enumTaxonomy, output);
+                            }
+                            else
+                            {
+                                OutputTaxonomyValueRecursive(entry, hierarchyCopy, enumTaxonomy, output);
+                            }
                         }
 
                         i++;

@@ -10,6 +10,18 @@ namespace PipelineDebug.Model
 {
     public class DiscoveryItem
     {
+        public DiscoveryItem(string name, string taxonomy, Type type, Type declaringType)
+        {
+            Name = name;
+            Taxonomy = taxonomy;
+            Type = type;
+            MemberType = MemberTypes.Property;
+            DeclaringType = declaringType.FullName;
+            ProtectionLevel = "public";
+            HasToString = type.HasToString();
+            IsPrimitive = type.IsPrimitive();
+        }
+
         public DiscoveryItem(string errorMessage, string declaringType)
         {
             Name = errorMessage;

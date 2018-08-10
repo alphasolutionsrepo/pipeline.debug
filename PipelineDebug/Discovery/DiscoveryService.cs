@@ -3,6 +3,7 @@ using PipelineDebug.Pipelines;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -68,12 +69,25 @@ namespace PipelineDebug.Discovery
                     GetMembers(genericType, item);
                     return;
                 }
-                else
+
+                var indexer = type.StringIndexParameter();
+                if (indexer != null)
                 {
-                    //If it wasn't IEnumberable<T> or inherited from IEnumerable<T> then it's unhandled right now
-                    item.Members.Add(new DiscoveryItem("Unhandled IEnumerable type", type.FullName));
+                    var valueType = indexer.PropertyType;
+                    var generic = typeof(KeyValuePair<,>);
+                    var constructed = generic.MakeGenericType(new Type[] { typeof(string), valueType });
+                    GetMembers(constructed, item);
                     return;
+                    //item.Members.Add(new DiscoveryItem(Constants.KeyValuePairKey, $"{item.Taxonomy}.{Constants.KeyValuePairKey}", typeof(string), indexer.DeclaringType));
+                    //item.Members.Add(new DiscoveryItem(Constants.KeyValuePairValue, $"{item.Taxonomy}.{Constants.KeyValuePairValue}", indexer.PropertyType, indexer.DeclaringType));
+                    //return;
                 }
+
+                //If it wasn't IEnumberable<T> or inherited from IEnumerable<T> 
+                //Or had a string indexer
+                //then it's unhandled right now
+                item.Members.Add(new DiscoveryItem("Unhandled IEnumerable type", type.FullName));
+                return;
             }
 
             var members = type.GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);

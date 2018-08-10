@@ -10,5 +10,8 @@ namespace PipelineDebug
     {
         public const string ArgsName = "args";
         public const string ContextName = "Sitecore.Context";
+
+        public const string KeyValuePairKey = "Key";
+        public const string KeyValuePairValue = "Value";
     }
 }

@@ -69,5 +69,18 @@ namespace PipelineDebug.Discovery
             }
             return null;
         }
+
+        public static PropertyInfo StringIndexParameter(this Type type)
+        {
+            foreach (var prop in type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
+            {
+                var indexParams = prop.GetIndexParameters();
+                if (indexParams.Length == 1 && typeof(string).IsAssignableFrom(indexParams[0].ParameterType))
+                {
+                    return prop;
+                }
+            }
+            return null;
+        }
     }
 }
