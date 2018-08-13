@@ -37,7 +37,20 @@ namespace PipelineDebug.Pipelines.PipelineDebug
             }
         }
 
-        public virtual List<string> Taxonomies { get; set; }
+        protected List<string> taxonomies;
+        public virtual List<string> Taxonomies {
+            get
+            {
+                return taxonomies;
+            }
+            set
+            {
+                taxonomies = value;
+                hierarchy = new TaxonomyHierarchy(string.Empty, value);
+            }
+        }
+
+        protected TaxonomyHierarchy hierarchy;
         
         public virtual void Process(PipelineArgs args)
         {
@@ -50,30 +63,24 @@ namespace PipelineDebug.Pipelines.PipelineDebug
 
             try
             {
-                foreach (var taxonomy in Taxonomies)
+                foreach (var subhierarchy in hierarchy.Children)
                 {
-                    if (string.IsNullOrWhiteSpace(taxonomy))
+                    if (string.IsNullOrWhiteSpace(subhierarchy.Name))
                         continue;
 
-                    if (taxonomy.StartsWith(Constants.ContextName))
+                    if (subhierarchy.Name == Constants.ContextName)
                     {
-                        var removedName = taxonomy.Substring(Constants.ContextName.Length + 1);
-                        var hierarchy = removedName.Split('.').ToList();
-                        OutputTaxonomyValueRecursive(new Sitecore.Context(), hierarchy, Constants.ContextName, output);
+                        foreach (var child in subhierarchy.Children)
+                        {
+                            OutputTaxonomyValueRecursive(new Sitecore.Context(), child, Constants.ContextName, output);
+                        }
                     }
-                    else if (taxonomy.StartsWith(Constants.ArgsName))
+                    else if (subhierarchy.Name == Constants.ArgsName)
                     {
-                        string removedName;
-                        if (taxonomy.Contains("]"))
+                        foreach (var child in subhierarchy.Children)
                         {
-                            removedName = taxonomy.Substring(taxonomy.IndexOf(']') + 2);
+                            OutputTaxonomyValueRecursive(args, child, Constants.ArgsName, output);
                         }
-                        else
-                        {
-                            removedName = taxonomy.Substring(Constants.ArgsName.Length + 1);
-                        }
-                        var hierarchy = removedName.Split('.').ToList();
-                        OutputTaxonomyValueRecursive(args, hierarchy, Constants.ArgsName, output);
                     }
                 }
             }
@@ -87,24 +94,20 @@ namespace PipelineDebug.Pipelines.PipelineDebug
             }
         }
 
-        protected virtual void OutputTaxonomyValueRecursive(object obj, List<string> hierarchy, string currentTaxonomy, OutputItem output)
+        protected virtual void OutputTaxonomyValueRecursive(object obj, TaxonomyHierarchy hierarchy, string currentTaxonomy, OutputItem output)
         {
-            //extract the next item in taxonomy to get from hierarchy and remove it.
-            var name = hierarchy[0];
-            hierarchy.RemoveAt(0);
-
             //check for members
-            var members = GetMemberInfos(obj, obj.GetType(), name);
+            var members = GetMemberInfos(obj, obj.GetType(), hierarchy.Name);
             
             //if no members existed, the type did not match the expected (can happen if a pipeline has different pipelineargs)
             if (members.Length == 0)
             {
-                output.Entries.Add(new OutputMember(currentTaxonomy, $"Member {name} not found.", null));
+                output.Entries.Add(new OutputMember(currentTaxonomy, $"Member {hierarchy.Name} not found.", null));
                 return;
             }
 
             //add the current member to the taxonomy
-            currentTaxonomy += "." + name;
+            currentTaxonomy += "." + hierarchy.Name;
 
             foreach (var info in members)
             {
@@ -145,22 +148,22 @@ namespace PipelineDebug.Pipelines.PipelineDebug
                         any = true;
                         var enumTaxonomy = currentTaxonomy + "[" + i + "]";
                         
-                        if (hierarchy.Count == 0)
+                        if (hierarchy.Selected)
                         {
                             output.Entries.Add(new OutputMember(currentTaxonomy, entry.ToString(), info.MemberType));
                         }
-                        else
+
+                        foreach (var child in hierarchy.Children)
                         {
-                            var hierarchyCopy = hierarchy.Select(item => item).ToList();
                             if (stringIndexed)
                             {
                                 var value = stringIndexParam.GetValue(member, new object[] { entry });
                                 var kvp = new KeyValuePair<string, object>((string)entry, value);
-                                OutputTaxonomyValueRecursive(kvp, hierarchyCopy, enumTaxonomy, output);
+                                OutputTaxonomyValueRecursive(kvp, child, enumTaxonomy, output);
                             }
                             else
                             {
-                                OutputTaxonomyValueRecursive(entry, hierarchyCopy, enumTaxonomy, output);
+                                OutputTaxonomyValueRecursive(entry, child, enumTaxonomy, output);
                             }
                         }
 
@@ -173,13 +176,14 @@ namespace PipelineDebug.Pipelines.PipelineDebug
                 }
                 else
                 {
-                    if (hierarchy.Count == 0)
+                    if (hierarchy.Selected)
                     {
                         output.Entries.Add(new OutputMember(currentTaxonomy, member.ToString(), info.MemberType));
                     }
-                    else
+
+                    foreach (var child in hierarchy.Children)
                     {
-                        OutputTaxonomyValueRecursive(member, hierarchy, currentTaxonomy, output);
+                        OutputTaxonomyValueRecursive(member, child, currentTaxonomy, output);
                     }
                 }
             }

@@ -97,6 +97,7 @@
     <Compile Include="Model\Response\PipelinesResponse.cs" />
     <Compile Include="Model\Response\ResponseStatus.cs" />
     <Compile Include="Model\SimpleProcessor.cs" />
+    <Compile Include="Model\TaxonomyHierarchy.cs" />
     <Compile Include="Output\IOutputService.cs" />
     <Compile Include="Output\OutputService.cs" />
     <Compile Include="Pipelines\Initialize\RegisterRoutes.cs" />

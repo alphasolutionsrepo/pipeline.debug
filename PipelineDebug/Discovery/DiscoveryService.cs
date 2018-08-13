@@ -78,9 +78,6 @@ namespace PipelineDebug.Discovery
                     var constructed = generic.MakeGenericType(new Type[] { typeof(string), valueType });
                     GetMembers(constructed, item);
                     return;
-                    //item.Members.Add(new DiscoveryItem(Constants.KeyValuePairKey, $"{item.Taxonomy}.{Constants.KeyValuePairKey}", typeof(string), indexer.DeclaringType));
-                    //item.Members.Add(new DiscoveryItem(Constants.KeyValuePairValue, $"{item.Taxonomy}.{Constants.KeyValuePairValue}", indexer.PropertyType, indexer.DeclaringType));
-                    //return;
                 }
 
                 //If it wasn't IEnumberable<T> or inherited from IEnumerable<T> 
