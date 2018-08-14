@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+	<metadata>
+		<version>$version$</version>
+		<authors>Alpha Solutions A/S</authors>
+		<owners>Alpha Solutions A/S</owners>
+		<copyright>Alpha Solutions A/S</copyright>
+		<id>pipeline.debug</id>
+		<title>pipeline.debug</title>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>pipeline.debug $version$ for Sitecore</description>
+	</metadata>
+	<files>
+		<file src="bin\PipelineDebug.dll" target="lib" />
+		<file src="App_Config\**\*.*" target="content\App_Config" />
+		<file src="sitecore\**\*.*" target="content\sitecore" />
+		<file src="readme.txt" target="" />
+	</files>
+</package>

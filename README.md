@@ -4,7 +4,9 @@ pipeline.debug is a tool for debugging Sitecore pipelines. Once it's deployed on
 
 The tool is intended for Sitecore developers with basic knowledge of the Sitecore Pipeline architecture and reflection of Sitecore's code in order to debug complex bugs.
 
-Installation can happen by cloning this repository and building. After build run "copy release.bat" and the files will be added to a release folder and is ready to be copied to the server. I will add it as a module to the Sitecore Marketplace and Nuget soon as well.
+Installation can happen by cloning this repository and building. After build run "copy release.bat" and the files will be added to a release folder and is ready to be copied to the server. 
+Alternately you can add it to your project from the Nuget feed: https://www.myget.org/F/pipelinedebug/api/v2
+I will add it as a module to the Sitecore Marketplace and Nuget soon as well.
 
 After installation, simply go to [scheme]://[host]/sitecore/admin/pipelinedebug.html and you can start setting up your debugging session. It requires the user to be a Sitecore Administrator, it will prompt you to login if you are not (In Sitecore 9+, just accessing /sitecore/admin/* requires admin login).
 
