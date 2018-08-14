@@ -19,18 +19,18 @@ You can add multiple processors to a pipeline, as well as adding processors to m
 
 ## Setting up which values to output
 
-Each configured debugprocessor has an icon to open the edit overlay. This overlay lets you decide which values you wish to output from the pipelines arguments and Sitecore.Context. At the top the currently selected values are shown. A newly added processor will automatically have any default taxonomies from settings added. You can add additional taxonomies either by writing them in the textboxes (once selected, a new textbox will pop up), or by using the discovery feature at the bottom. 
+Each configured debugprocessor has an icon to open the edit overlay. This overlay lets you decide which values you wish to output from the pipelines arguments and Sitecore.Context. At the top the currently selected values are shown. A newly added processor will automatically have the default taxonomies that are defined under the Settings window. You can add additional taxonomies either by writing them in the textboxes (once selected, a new textbox will pop up), or by using the discovery feature at the bottom. 
 
-In the below example I chose that I wish to output the cookies of the request in my httpRequestBegin pipeline.
+In the below example I have chosen to output the cookies of the request in my httpRequestBegin pipeline.
 ![Selecting taxonomies via the discovery feature](PipelineDebug/Documentation/edit-processor.gif)
 
-The discovery uses reflection to find all properties and fields (public or private) of the given types. The list is however not necesarily exhaustive, since we can only find the members of the declared types, and not possible inherited types used in their stead. This is for instance clearly displayed when using Sitecore Commerce's ServicePipelineArgs, where the ServiceProviderRequest and ServiceProviderResult is always an inherited class with context-specific members. This problem only exists at discovery time. When the debugprocessor is run, it will reflect the runtime type, and all members will be found. This means that any valid taxonomies added via the textboxes, will work - this however requires you to do some reflection on your own, in order to find the taxonomies.
+The discovery uses reflection to find all properties and fields (public or private) of the given types. The list is however not necessarily exhaustive since we can only find the members of the declared types and not the concrete types in cases of inheritance. This is for instance clearly displayed when using the Sitecore Commerce ServicePipelineArgs, where the ServiceProviderRequest and ServiceProviderResult are always inherited classes with context-specific members. This problem only exists at discovery time. When the debugprocessor is run, it will reflect the runtime type, and all members will be found. This means that any valid taxonomies added via the textboxes, will work - this however requires you to do some reflection on your own, in order to find the taxonomies.
 
 In case the debugprocessor encounters null values or empty enumerables "on its way" to a given taxonomy, it prints that the value is null and continues.
 
 ## Managing configured processors
 
-The Processors window gives an overview of all active processors. Here you can easily edit or remove each processor.
+The Debug Processors window gives an overview of all active processors. Here you can easily edit or remove each processor.
 ![The processors overview](PipelineDebug/Documentation/processors.png)
 
 ## Managing the settings
@@ -64,7 +64,7 @@ Whenever a new debugprocessor is added, it's given the taxonomies set in "Defaul
 
 The Memory output window allows you to see the output from all processors. As of now you can only filter on processor type. Additional dynamic filters might be added in the future.
 
-The formatting of the output isn't much to talk about as of now. It's just a timestamp and which processor, followed by the values of all the selected taxonomies. I've considered many things such as adding functionality for toggling the logs, adding more distinct formatting. But I really find that it depends on the selected data and the amount of logs which solution is better. Any input on how to improve this is very welcome. Look me up @morten.engel on the Sitecore Slack channel. 
+The formatting of the output isn't much to talk about as of now. It's just a timestamp and which processor, followed by the values of all the selected taxonomies. I've considered many things such as adding functionality for toggling the logs, adding more distinct formatting. But I really find that the best solution can vary depending on the selected data and the amount of logs. Any input on how to improve this is very welcome. Look me up @morten.engel on the Sitecore Slack channel. 
 
 ![The output window](PipelineDebug/Documentation/output.png)
 
@@ -76,13 +76,13 @@ The tool is designed as runtime only. If you want permanent logging in pipelines
 
 ## A word of caution
 
-While the tool is limited to outputting values of fields and properties, it's not without risk. Consider for instance a lazy property "B" that is not supposed to be set until "A" has already been set. If you add a debugprocessor before "A" is set, and output "B", "B" will have the wrong value, not just for your own debugging output, but any following uses. If you're unsure what a property does, at least test the processor on a non-production environment before running it on production.
+While the tool is limited to outputting values of fields and properties, it's not without risk. Consider for instance a lazy property "B" that uses the value of "A" first get. If you add a debugprocessor before "A" is set, and output "B", "B" will have the wrong value, not just for your own debugging output, but any following uses. If you're unsure what a property does, at least test the processor on a non-production environment before running it on production.
 
 ## Changing the UI
 
-I'm not much a frontender, I know. If you want to change something, feel free to change it in the html/js/css files included. If you're changing it for the better, you're welcome to make a merge request on a fork (but don't make it in some frontend framework that I'll have to learn to edit it myself).
+I'm not much of a frontender, I know. If you want to change something, feel free to change it in the html/js/css files included. If you're changing it for the better, you're welcome to make a merge request on a fork (but don't make it in some frontend framework that I'll have to learn to edit in myself).
 
 ## Extending functionality
 
-Most of the coding is made by services setup via IOC in the PipelineDebug.config file. Most improvements shouldn't be hard to implement, either by extending and configuring, or by simply cloning the repository and coding the wanted changes. If you make something that would be usable to others I would love to hear about it. Create a fork and a merge request, or look me up on Sitecore Slack @morten.engel
+Most of the coding is made by services setup via IOC in the PipelineDebug.config file. Most improvements shouldn't be hard to implement, either by extending and configuring, or by simply cloning the repository and coding the wanted changes. If you make something that would be useful to others I would love to hear about it. Create a fork and a merge request, or look me up on Sitecore Slack @morten.engel
 
