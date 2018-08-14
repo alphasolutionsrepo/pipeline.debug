@@ -11,9 +11,9 @@
 		<description>pipeline.debug $version$ for Sitecore</description>
 	</metadata>
 	<files>
-		<file src="bin\PipelineDebug.dll" target="lib" />
-		<file src="App_Config\**\*.*" target="content\App_Config" />
-		<file src="sitecore\**\*.*" target="content\sitecore" />
+		<file src="..\PipelineDebug\bin\PipelineDebug.dll" target="lib" />
+		<file src="..\PipelineDebug\App_Config\**\*.*" target="content\App_Config" />
+		<file src="..\PipelineDebug\sitecore\**\*.*" target="content\sitecore" />
 		<file src="readme.txt" target="" />
 	</files>
 </package>
