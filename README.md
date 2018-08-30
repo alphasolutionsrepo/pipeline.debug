@@ -72,7 +72,7 @@ The formatting of the output isn't much to talk about as of now. It's just a tim
 
 ## Importing and exporting configuration
 
-The tool is designed as runtime only. If you want permanent logging in pipelines, you should create and configure the according processor (It wouldn't be hard to expand functionality to autoload an entire configuration, but real logging should be made in real processors). However sometimes you might want to be able to recreate the same setup easily. Once you're done with your configuration, just go to the Import/Export configuration window, and copy the JSON value from the Current Configuration textarea. Next time you want to create (or reset) to this configuration. Simply paste it to the Import Configuration textarea, and click Import.
+The tool is designed as runtime only. If you want permanent logging in pipelines, you should create and configure the according processor (It wouldn't be hard to expand functionality to autoload an entire configuration, but real logging should be made in real processors). However sometimes you might want to be able to recreate the same setup easily (or copy a configuration to multiple CD servers). Once you're done with your configuration, just go to the Import/Export configuration window, and copy the JSON value from the Current Configuration textarea. Next time you want to create (or reset) to this configuration. Simply paste it to the Import Configuration textarea, and click Import.
 
 ![The import/export window](PipelineDebug/Documentation/import.png)
 
@@ -88,3 +88,6 @@ I'm not much of a frontender, I know. If you want to change something, feel free
 
 Most of the coding is made by services setup via IOC in the PipelineDebug.config file. Most improvements shouldn't be hard to implement, either by extending and configuring, or by simply cloning the repository and coding the wanted changes. If you make something that would be useful to others I would love to hear about it. Create a fork and a merge request, or look me up on Sitecore Slack @morten.engel
 
+## A bit of background
+
+If you're curious as to why this module was made, or for a couple of examples of when it was used, I wrote up a bit about it on [my blog](https://mortenengel.blogspot.com/2018/08/pipelinedebug-gui-tool-for-runtime.html)
