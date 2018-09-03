@@ -111,6 +111,7 @@
     <Compile Include="Pipelines\ProcessorWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflection\Implementation\Base.cs" />
+    <Compile Include="Reflection\Implementation\Sitecore_8_2_7.cs" />
     <Compile Include="Reflection\Implementation\Sitecore_9_0_2.cs" />
     <Compile Include="Reflection\IReflectionService.cs" />
     <Compile Include="Reflection\IReflectionServiceFactory.cs" />

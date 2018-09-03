@@ -42,6 +42,7 @@ namespace PipelineDebug.Settings
 
         public struct Versions
         {
+			public static string Sitecore8_2_7 = "10.0.9.00605";
             public static string Sitecore9_0_2 = "11.1.2.00461";
         }
     }
